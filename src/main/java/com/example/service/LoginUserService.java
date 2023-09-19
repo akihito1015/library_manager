@@ -5,32 +5,24 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import com.example.entity.User;
 import com.example.repository.UserRepository;
 
 @Service
-public class LoginUserService implements UserDetailsService {
+public class LoginUserService implements UserDetailsService{
+	private final UserRepository userRepository;
 
-    private final UserRepository userRepository;
+	@Autowired
+	public LoginUserService(UserRepository userRepository) {
+		this.userRepository = userRepository;
+	}
 
-    // コンストラクタインジェクション
-    @Autowired
-    public LoginUserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
-
-
-    @Override
-    // emailはユーザーから送信されるメールアドレスを想定しています
-    public LoginUser loadUserByUsername(String email) throws UsernameNotFoundException {
-        // emailによりデータベースからユーザ情報の取得
-        User user = this.userRepository.findByEmail(email);
-
-        // ユーザー情報が見つからない場合、例外を発生させます
-        if (user == null) {
-            throw new UsernameNotFoundException("ユーザが見つかりません");
-        }
-
-        // ユーザ情報が見つかった場合は、UserDetailsを生成し返却します
-        return new LoginUser(user);
-    }
+	@Override
+	public LoginUser loadUserByUsername(String email) throws UsernameNotFoundException {
+		User user = this.userRepository.findByEmail(email);
+		if (user == null) {
+			throw new UsernameNotFoundException("ユーザが見つかりません");
+		}
+		return new LoginUser(user);
+	}
 }
